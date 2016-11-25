@@ -16,10 +16,10 @@
 
 package org.gradle.api.internal.tasks.cache;
 
-import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+import org.gradle.util.HasherUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,64 +36,56 @@ public class DefaultTaskCacheKeyBuilder implements TaskCacheKeyBuilder {
     @Override
     public TaskCacheKeyBuilder putByte(byte b) {
         log("byte", b);
-        hasher.putInt(1);
-        hasher.putByte(b);
+        HasherUtil.putByte(hasher, b);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putBytes(byte[] bytes) {
         log("bytes", new ByteArrayToStringer(bytes));
-        hasher.putInt(bytes.length);
-        hasher.putBytes(bytes);
+        HasherUtil.putBytes(hasher, bytes);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putBytes(byte[] bytes, int off, int len) {
         log("bytes", new ByteArrayToStringer(bytes, off, len));
-        hasher.putInt(len);
-        hasher.putBytes(bytes, off, len);
+        HasherUtil.putBytes(hasher, bytes, off, len);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putInt(int i) {
         log("int", i);
-        hasher.putInt(4);
-        hasher.putInt(i);
+        HasherUtil.putInt(hasher, i);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putLong(long l) {
         log("long", l);
-        hasher.putInt(8);
-        hasher.putLong(l);
+        HasherUtil.putLong(hasher, l);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putDouble(double d) {
         log("double", d);
-        hasher.putInt(8);
-        hasher.putDouble(d);
+        HasherUtil.putDouble(hasher, d);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putBoolean(boolean b) {
         log("boolean", b);
-        hasher.putInt(1);
-        hasher.putBoolean(b);
+        HasherUtil.putBoolean(hasher, b);
         return this;
     }
 
     @Override
     public TaskCacheKeyBuilder putString(CharSequence charSequence) {
         log("string", charSequence);
-        hasher.putInt(charSequence.length());
-        hasher.putString(charSequence, Charsets.UTF_8);
+        HasherUtil.putString(hasher, charSequence);
         return this;
     }
 
@@ -102,6 +94,10 @@ public class DefaultTaskCacheKeyBuilder implements TaskCacheKeyBuilder {
         HashCode hashCode = hasher.hash();
         LOGGER.debug("Hash code generated: {}", hashCode);
         return new DefaultTaskCacheKey(hashCode);
+    }
+
+    public Hasher getHasher() {
+        return hasher;
     }
 
     private static class DefaultTaskCacheKey implements TaskCacheKey {
