@@ -25,6 +25,7 @@ import org.gradle.api.UncheckedIOException;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
 import org.gradle.api.internal.file.collections.DirectoryFileTree;
+import org.gradle.api.tasks.bundling.Zip;
 import org.gradle.internal.ErroringAction;
 import org.gradle.internal.IoActions;
 import org.gradle.internal.UncheckedException;
@@ -53,8 +54,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -302,19 +301,7 @@ class RuntimeShadedJarCreator {
 
     private ZipEntry newZipEntry(String name) {
         ZipEntry entry = new ZipEntry(name);
-        // Note that setting the January 1st 1980 (or even worse, "0", as time) won't work due
-        // to Java 8 doing some interesting time processing: It checks if this date is before January 1st 1980
-        // and if it is it starts setting some extra fields in the zip. Java 7 does not do that - but in the
-        // zip not the milliseconds are saved but values for each of the date fields - but no time zone. And
-        // 1980 is the first year which can be saved.
-        // If you use January 1st 1980 then it is treated as a special flag in Java 8.
-        // Moreover, only even seconds can be stored in the zip file. Java 8 uses the upper half of
-        // some other long to store the remaining millis while Java 7 doesn't do that. So make sure
-        // that your seconds are even.
-        Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.set(1980, Calendar.FEBRUARY, 1, 0, 0, 0);
-        entry.setTime(calendar.getTimeInMillis());
+        entry.setTime(Zip.CONSTANT_TIME_FOR_ZIP_ENTRIES);
         return entry;
     }
 
