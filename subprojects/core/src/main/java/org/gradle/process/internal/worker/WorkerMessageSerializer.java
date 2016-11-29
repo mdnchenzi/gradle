@@ -39,7 +39,7 @@ import org.gradle.internal.serialize.SerializerRegistry;
 
 public class WorkerMessageSerializer {
 
-    static SerializerRegistry create() {
+    public static SerializerRegistry create() {
         DefaultSerializerRegistry registry = new DefaultSerializerRegistry();
 
         BaseSerializerFactory factory = new BaseSerializerFactory();

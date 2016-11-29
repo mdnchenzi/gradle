@@ -29,6 +29,7 @@ import org.gradle.internal.remote.internal.inet.MultiChoiceAddressSerializer;
 import org.gradle.internal.remote.services.MessagingServices;
 import org.gradle.internal.serialize.Decoder;
 import org.gradle.internal.serialize.InputStreamBackedDecoder;
+import org.gradle.process.internal.worker.WorkerMessageSerializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -104,6 +105,7 @@ public class SystemApplicationClassLoaderWorker implements Callable<Void> {
     }
 
     private void configureLogging(LoggingManagerInternal loggingManager, ObjectConnection connection) {
+        connection.useParameterSerializers(WorkerMessageSerializer.create());
         WorkerLoggingProtocol workerLoggingProtocol = connection.addOutgoing(WorkerLoggingProtocol.class);
         loggingManager.addOutputEventListener(new WorkerOutputEventListener(workerLoggingProtocol));
     }
